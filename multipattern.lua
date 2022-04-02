@@ -10,7 +10,7 @@ function multipattern.new(pattern)
     mpat.actions = {}
 
     pattern.process = function(data)
-        mpat.actions[data.id](data.args)
+        mpat.actions[data.id](table.unpack(data.args))
     end
 
     return mpat
