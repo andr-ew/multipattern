@@ -16,6 +16,7 @@ function multipattern.new(pattern)
     return mpat
 end
 
+-- wrap one function in one pattern
 function multipattern:wrap(id, action)
     if self.actions[id] then
         console.log('multipattern: the id '..id..' already exists!')
@@ -26,6 +27,24 @@ function multipattern:wrap(id, action)
     return function(...)
         action(...)
         self.pattern:watch({ id = id, args = { ... } })
+    end
+end
+
+-- wrap one function in multiple patterns
+function multipattern.wrap_set(set, id, action)
+    for _,mp in ipairs(set) do
+        if mp.actions[id] then
+            console.log('multipattern: the id '..id..' already exists!')
+        else
+            mp.actions[id] = action
+        end
+    end
+    
+    return function(...)
+        action(...)
+        for _,mp in ipairs(set) do
+            mp.pattern:watch({ id = id, args = { ... } })
+        end
     end
 end
 
