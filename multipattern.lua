@@ -19,7 +19,7 @@ end
 -- wrap one function in one pattern
 function multipattern:wrap(id, action)
     if self.actions[id] then
-        console.log('multipattern: the id '..id..' already exists!')
+        print('multipattern: the id '..id..' already exists!')
     else
         self.actions[id] = action
     end
@@ -34,7 +34,7 @@ end
 function multipattern.wrap_set(set, id, action)
     for _,mp in ipairs(set) do
         if mp.actions[id] then
-            console.log('multipattern: the id '..id..' already exists!')
+            print('multipattern: the id '..id..' already exists!')
         else
             mp.actions[id] = action
         end
