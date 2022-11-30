@@ -18,36 +18,57 @@ function multipattern.new(pattern)
     return mpat
 end
 
--- wrap one function in one pattern
-function multipattern:wrap(id, action)
-    if self.actions[id] then
-        print('multipattern: the id '..id..' already exists!')
-    else
-        self.actions[id] = action
-    end
 
-    return function(...)
-        action(...)
-        self.pattern:watch({ id = id, args = { ... } })
+-- wrap a function. mpat can be either self, or a table of multiple instances
+function multipattern.wrap(mpat, id, action)
+    if mpat.wrap then
+        local self = mpat
+
+        if self.actions[id] then
+            print('multipattern: the id '..id..' already exists!')
+        else
+            self.actions[id] = action
+        end
+
+        return function(...)
+            action(...)
+            self.pattern:watch({ id = id, args = { ... } })
+        end
+    elseif #mpat > 0 then
+        local set = mpat
+
+        for _,mp in ipairs(set) do
+            if mp.actions[id] then
+                print('multipattern: the id '..id..' already exists!')
+            else
+                mp.actions[id] = action
+            end
+        end
+        
+        return function(...)
+            action(...)
+            for _,mp in ipairs(set) do
+                mp.pattern:watch({ id = id, args = { ... } })
+            end
+        end
     end
 end
 
--- wrap one function in multiple patterns
-function multipattern.wrap_set(set, id, action)
-    for _,mp in ipairs(set) do
-        if mp.actions[id] then
-            print('multipattern: the id '..id..' already exists!')
-        else
-            mp.actions[id] = action
-        end
+-- wrap a paramset, returns a table of wrapped param setter functions. mpat can be either self, or a table of multiple instances.
+function multipattern.wrap_paramset(mpat, pset)
+    pset = pset or params
+
+    local set_param = {}
+
+    for _,p in pairs(pset.params) do
+        set_param[p.id] = multipattern.wrap(
+            mpat, 
+            p.id, 
+            function(v) pset:set(p.id, v) end
+        )
     end
-    
-    return function(...)
-        action(...)
-        for _,mp in ipairs(set) do
-            mp.pattern:watch({ id = id, args = { ... } })
-        end
-    end
+
+    return set_param
 end
 
 return multipattern
