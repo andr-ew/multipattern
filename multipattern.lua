@@ -34,10 +34,10 @@ function multipattern.wrap(mpat, id, action)
             action(...)
             self.pattern:watch({ id = id, args = { ... } })
         end
-    elseif #mpat > 0 then
+    else
         local set = mpat
 
-        for _,mp in ipairs(set) do
+        for _,mp in pairs(set) do
             if mp.actions[id] then
                 print('multipattern: the id '..id..' already exists!')
             else
@@ -47,7 +47,7 @@ function multipattern.wrap(mpat, id, action)
         
         return function(...)
             action(...)
-            for _,mp in ipairs(set) do
+            for _,mp in pairs(set) do
                 mp.pattern:watch({ id = id, args = { ... } })
             end
         end
