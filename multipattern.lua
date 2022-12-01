@@ -54,21 +54,4 @@ function multipattern.wrap(mpat, id, action)
     end
 end
 
--- wrap a paramset, returns a table of wrapped param setter functions. mpat can be either self, or a table of multiple instances.
-function multipattern.wrap_paramset(mpat, pset)
-    pset = pset or params
-
-    local set_param = {}
-
-    for _,p in pairs(pset.params) do
-        set_param[p.id] = multipattern.wrap(
-            mpat, 
-            p.id, 
-            function(v) pset:set(p.id, v) end
-        )
-    end
-
-    return set_param
-end
-
 return multipattern
